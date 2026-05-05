@@ -14,3 +14,22 @@ body {
   }
 
   
+ 
+  header {
+    padding: 3rem 4rem 2rem;
+    border-bottom: 1px solid #2a2a2a;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+  }
+  .logo {
+    font-family: 'Bebas Neue', cursive;
+    font-size: 2.5rem;
+    color: #f0ede6;
+    letter-spacing: 0.05em;
+    line-height: 1;
+  }
+
+    .logo span {
+        color: #ff6f61;
+    }
