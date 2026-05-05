@@ -33,3 +33,16 @@ body {
     .logo span {
         color: #ff6f61;
     }
+    .tagline {
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: #555;
+    padding-bottom: 0.5rem;
+    }
+    main {
+        flex: 1;
+        display: grid;
+        align-items: center;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 0;
+        padding: 4rem;}
