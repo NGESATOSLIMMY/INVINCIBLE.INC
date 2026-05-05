@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Strike</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- =============================================
+       HEADER — sticky top navigation bar
+  ============================================= -->
+  <header>
+    <a href="index.html" class="back-btn">← Home</a>
+    <!-- Clicking this returns the user to index.html (the main nav page) -->
+    <div class="page-title">My <span>Strike</span></div>
+    <!-- "Strike" is in a <span> so CSS can color just that word green -->
+    <div class="tab-switcher">
+      <!-- Feed tab: shows all uploaded posts. active class = currently selected -->
+      <button class="tab-btn active" onclick="showTab('feed')">Feed</button>
+      <!-- Applauded tab: shows only posts you have applauded -->
+      <button class="tab-btn" onclick="showTab('applauded')">👏 Applauded</button>
+    </div>
+  </header>
+  <!-- =============================================
+       MAIN CONTENT AREA
+  ============================================= -->
+  <main>
+    <!-- FEED VIEW — shown by default when page loads -->
+    <div id="feed-view">
+      <!-- Upload zone — user clicks or drags files here -->
+      <div class="upload-zone" id="uploadZone">
+        <!-- Hidden file input: accepts images and videos, allows selecting multiple at once -->
+        <!-- onchange fires when files are selected, passing them to handleFiles() -->
+        <input type="file" id="fileInput" accept="image/*,video/*" multiple onchange="handleFiles(this.files)">
+        <span class="upload-icon">⚡</span>
+        <div style="font-size:1rem; font-weight:500; margin-bottom:0.4rem;">Drop your strike here</div>
+        <div class="upload-label">Drag & drop or <strong>click to upload</strong> — images or videos</div>
+      </div>
+      <div class="section-label">All Posts</div>
+      <!-- Section heading above the posts grid -->
+      <div class="posts-grid" id="postsGrid"></div>
+      <!-- This starts empty — JavaScript fills it with post cards dynamically -->
+      <!-- Shown only when there are zero posts in the grid -->
+      <div class="empty-state" id="emptyState">
+        <span class="big">📭</span>
+        No posts yet — upload something above!
+      </div>
+    </div>
+    <!-- end #feed-view -->
+    <!-- APPLAUDED VIEW — hidden until the Applauded tab is clicked -->
+    <div id="applauded-view">
+      <div class="section-label">Posts You Applauded</div>
+      <div class="posts-grid" id="applaudedGrid"></div>
+      <!-- JavaScript fills this with only the posts where applauded = true -->
+      <!-- Shown when no posts have been applauded yet -->
+      <div class="applauded-empty" id="applaudedEmpty">
+        <span>🫨🫨🫨</span>
+        Nothing applauded yet — go give some love to your country!
+      </div>
+    </div>
+    <!-- end #applauded-view -->
+  </main>
+  <!-- =============================================
+       FOOTER — bottom of the page
+  ============================================= -->
+  <footer>
+    <span>My Strike</span>
+    <span id="foot-date"></span>
+    <!-- foot-date is filled in by JavaScript with today's date -->
+  </footer>
+</body>
+</html>
