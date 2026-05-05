@@ -45,4 +45,50 @@ body {
         align-items: center;
         grid-template-columns: repeat(4, 1fr);
         gap: 0;
-        padding: 4rem;}
+        padding: 4rem;
+    }
+
+    .nav-card {
+            display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 3rem 2.5rem;
+    text-decoration: none;
+    color: inherit;
+    border-right: 1px solid #2a2a2a;
+    position: relative;
+    overflow: hidden;
+    min-height: 65vh;
+    transition: background 0.3s ease;
+    cursor: pointer;
+  }
+
+    .nav-card:last-child { border-right: none; }
+
+    .nav-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: #c8ff00;
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.35s ease;
+  }
+    .nav-card:hover::before { 
+        transform: scaleX(1); 
+    }
+    .nav-card:hover {
+         background: #161616; 
+        }
+    .nav-card:hover .card-number {
+         color: #c8ff00;
+         }
+    .nav-card:hover .card-arrow {
+     transform: translate(4px, -4px); color: #c8ff00; 
+    }
+
+
+
+
+    }
