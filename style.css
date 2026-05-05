@@ -3,3 +3,14 @@
      padding: 0; 
      box-sizing: border-box;
      }
+
+body {
+    font-family: 'DM Sans', sans-serif;
+    background: #0e0e0e;
+    color: #f0ede6;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  
