@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Home</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>
+  <div class="logo">INVINCIBLE.INC<span>.</span></div>
+  <div class="tagline">Select a section</div>
+</header>
+
+<main>
+
+  <a href="my strike.html" class="nav-card">
+    <div class="card-number">01</div>
+    <div class="card-bottom">
+      <div class="card-label">My Strike</div>
+      <div class="card-file">my strike.html</div>
+      <div class="card-arrow">↗</div>
+    </div>
+  </a>
+
+  <a href="movement.html" class="nav-card">
+    <div class="card-number">02</div>
+    <div class="card-bottom">
+      <div class="card-label">Movement</div>
+      <div class="card-file">movement.html</div>
+      <div class="card-arrow">↗</div>
+    </div>
+  </a>
+
+  <a href="strike.html" class="nav-card">
+    <div class="card-number">03</div>
+    <div class="card-bottom">
+      <div class="card-label">Strike</div>
+      <div class="card-file">strike.html</div>
+      <div class="card-arrow">↗</div>
+    </div>
+  </a>
+
+  <a href="exposed.html" class="nav-card">
+    <div class="card-number">04</div>
+    <div class="card-bottom">
+      <div class="card-label">Exposed</div>
+      <div class="card-file">exposed.html</div>
+      <div class="card-arrow">↗</div>
+    </div>
+  </a>
+
+</main>
+
+<footer>
+  <span>Home</span>
+  <span id="dt"></span>
+</footer>
+
+<script>
+  const d = new Date();
+  document.getElementById('dt').textContent = d.toLocaleDateString('en-GB', {day:'2-digit', month:'short', year:'numeric'});
+</script>
+
+</body>
+</html>
