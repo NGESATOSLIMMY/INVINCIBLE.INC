@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Strike</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+  <style>
+    /* =============================================
+       RESET — removes default browser spacing
+       so everything starts from zero
+    ============================================= */
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    /* =============================================
+       COLOR VARIABLES — defined once here,
+       used everywhere with var(--name).
+       Change a color here = changes everywhere.
+    ============================================= */
+    :root {
+      --bg: #0a0a0a;                       /* Main page background (near black) */
+      --surface: #141414;                  /* Card background (slightly lighter) */
+      --surface2: #1c1c1c;                 /* Input / inner element background */
+      --border: #2a2a2a;                   /* Subtle border color */
+      --text: #f0ede6;                     /* Main text color (off-white) */
+      --muted: #555;                       /* Dimmed / secondary text */
+      --accent: #c8ff00;                   /* Bright green highlight color */
+      --accent-dim: rgba(200,255,0,0.1);   /* Transparent accent for backgrounds */
+    }
+
+    /* =============================================
+       BODY — base styles for the whole page
+    ============================================= */
+    body {
+      font-family: 'DM Sans', sans-serif; /* Default font for all text */
+      background: var(--bg);              /* Dark background */
+      color: var(--text);                 /* Off-white text */
+      min-height: 100vh;                  /* Page is at least full screen tall */
+    }
+
+    /* =============================================
+       HEADER — the top bar with title and tabs
+    ============================================= */
+    header {
+      padding: 2rem 3rem;                     /* Space inside the header */
+      border-bottom: 1px solid var(--border); /* Line under the header */
+      display: flex;                          /* Lay children side by side */
+      align-items: center;                    /* Vertically center children */
+      justify-content: space-between;         /* Push items to opposite ends */
+      position: sticky;                       /* Stays at top when you scroll */
+      top: 0;                                 /* Sticks to the very top of the page */
+      background: var(--bg);                  /* Same dark bg so content scrolls under it */
+      z-index: 100;                           /* Sits above all other content */
+    }
+
+    /* Back button — links back to index.html */
+    .back-btn {
+      font-size: 0.7rem;
+      letter-spacing: 0.15em;    /* Spaced-out letters for the uppercase style */
+      text-transform: uppercase;
+      color: var(--muted);
+      text-decoration: none;     /* Removes the default underline on links */
+      transition: color 0.2s;    /* Smooth color change on hover */
+    }
+    .back-btn:hover { color: var(--accent); } /* Turns green when hovered */
+
+    /* Page title "My Strike" */
+    .page-title {
+      font-family: 'Bebas Neue', sans-serif; /* Bold display font */
+      font-size: 2rem;
+      letter-spacing: 0.08em;
+    }
+    .page-title span { color: var(--accent); } /* The word "Strike" gets green color */
+
+    /* Tab switcher — holds the Feed and Applauded buttons side by side */
+    .tab-switcher {
+      display: flex;
+      gap: 0;                    /* No gap — buttons share their borders */
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      overflow: hidden;          /* Clips the buttons to the rounded corners */
+    }
+
+    /* Individual tab buttons */
+    .tab-btn {
+      padding: 0.5rem 1.25rem;
+      font-size: 0.72rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      background: transparent;
+      border: none;
+      color: var(--muted);
+      cursor: pointer;           /* Shows a hand cursor on hover */
+      font-family: 'DM Sans', sans-serif;
+      transition: background 0.2s, color 0.2s;
+    }
+
+    /* The currently selected / active tab */
+    .tab-btn.active {
+      background: var(--accent); /* Green background */
+      color: #000;               /* Black text on green */
+      font-weight: 500;
+    }
+
+    /* =============================================
+       MAIN — content area below the header
+    ============================================= */
+    main { padding: 2.5rem 3rem; max-width: 1100px; margin: 0 auto; }
+    /* max-width + margin auto = centered column with maximum width 1100px */
+
+    /* =============================================
+       UPLOAD ZONE — the drag and drop area
+    ============================================= */
+    .upload-zone {
+      border: 1.5px dashed var(--border); /* Dashed border signals "drop here" */
+      border-radius: 12px;
+      padding: 3rem;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+      margin-bottom: 2.5rem;
+      position: relative;        /* Needed so the hidden file input can overlay it */
+    }
+
+    /* Style when hovering over the zone or actively dragging a file onto it */
+    .upload-zone:hover, .upload-zone.dragover {
+      border-color: var(--accent); /* Border turns green */
+      background: var(--accent-dim); /* Faint green glow behind it */
+    }
+
+    /* Hidden file input — invisible but covers the whole zone so clicking works */
+    .upload-zone input[type=file] {
+      position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%;
+    }
+
+    .upload-icon { font-size: 2.5rem; margin-bottom: 0.75rem; display: block; }
+    .upload-label { font-size: 0.85rem; color: var(--muted); }
+    .upload-label strong { color: var(--accent); font-weight: 500; }
+
+    /* =============================================
+       FEED VIEWS — controls which tab is visible
+    ============================================= */
+    #feed-view { display: block; }    /* Feed tab shown by default */
+    #applauded-view { display: none; } /* Applauded tab hidden by default */
+
+    /* Small uppercase label above a section e.g. "All Posts" */
+    .section-label {
+      font-size: 0.68rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 1.25rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    /* The horizontal line that appears after the label text */
+    .section-label::after {
+      content: '';             /* Empty element just for the line */
+      flex: 1;                 /* Stretches to fill remaining row space */
+      height: 1px;
+      background: var(--border);
+    }
+
+    /* =============================================
+       POSTS GRID — responsive card layout
+    ============================================= */
+    .posts-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      /* auto-fill: browser adds as many columns as will fit
+         minmax(300px, 1fr): each column is at least 300px, grows equally */
+      gap: 1.5rem; /* Space between cards */
+    }
+
+    /* =============================================
+       POST CARD — each uploaded photo or video
+    ============================================= */
+    .post-card {
+      background: var(--surface);    /* Slightly lighter than page background */
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;              /* Clips media to the card's rounded corners */
+      transition: border-color 0.2s;
+      animation: fadeUp 0.4s ease both; /* Plays the fade-in animation when card appears */
+    }
+    .post-card:hover { border-color: #3a3a3a; } /* Brighter border on hover */
+
+    /* Fade-up animation — cards slide up from below and fade in when added */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); } /* Start: invisible, shifted down */
+      to   { opacity: 1; transform: translateY(0); }     /* End: fully visible, normal position */
+    }
+
+    /* Media container — keeps image/video at a fixed 16:10 ratio */
+    .media-wrap {
+      position: relative;       /* Lets the badge and delete button be placed inside */
+      background: #000;
+      aspect-ratio: 16/10;      /* Maintains width-to-height ratio */
+      overflow: hidden;
+    }
+
+    /* The actual image or video element inside the card */
+    .media-wrap img, .media-wrap video {
+      width: 100%; height: 100%;
+      object-fit: cover;        /* Fills the space, crops edges if needed */
+      display: block;
+    }
+
+    /* Small "image" or "video" label in the top-right corner */
+    .media-type-badge {
+      position: absolute;       /* Floats over the media */
+      top: 0.6rem; right: 0.6rem;
+      font-size: 0.6rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      background: rgba(0,0,0,0.7); /* Semi-transparent black pill */
+      color: #fff;
+      padding: 3px 8px;
+      border-radius: 4px;
+    }
+
+    /* Red X delete button — appears in the top-left corner on hover */
+    .delete-btn {
+      position: absolute;
+      top: 0.6rem; left: 0.6rem;
+      background: rgba(0,0,0,0.7);
+      border: none;
+      color: #ff5555;           /* Red X */
+      font-size: 0.75rem;
+      width: 26px; height: 26px;
+      border-radius: 50%;       /* Circle shape */
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0;               /* Invisible by default */
+      transition: opacity 0.2s;
+    }
+    .post-card:hover .delete-btn { opacity: 1; } /* Appears when card is hovered */
+
+    /* Card body — the area below the media thumbnail */
+    .post-body { padding: 1rem 1.25rem; }
+
+    /* Shows the filename and upload date under the media */
+    .post-meta {
+      font-size: 0.68rem;
+      color: var(--muted);
+      letter-spacing: 0.08em;
+      margin-bottom: 0.75rem;
+    }
+
+    /* =============================================
+       APPLAUD BUTTON ROW
+    ============================================= */
+    .action-row {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 0.85rem;
+    }
+
+    /* The applaud button itself */
+    .applaud-btn {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: 20px;      /* Pill shape */
+      padding: 0.35rem 0.85rem;
+      color: var(--muted);
+      font-size: 0.78rem;
+      cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+      transition: all 0.2s;
+    }
+    .applaud-btn:hover {
+      border-color: var(--accent); /* Green border on hover */
+      color: var(--accent);
+    }
+    /* State when the post has been applauded */
+    .applaud-btn.applauded {
+      background: var(--accent-dim); /* Faint green fill */
+      border-color: var(--accent);
+      color: var(--accent);
+      font-weight: 500;
+    }
+    .applaud-btn .clap-icon { font-size: 1rem; }
+
+    /* =============================================
+       COMMENTS SECTION
+    ============================================= */
+    .comments-section { margin-top: 0.6rem; }
+
+    /* A single comment row */
+    .comment-item {
+      font-size: 0.78rem;
+      color: #ccc;
+      line-height: 1.5;
+      padding: 0.5rem 0;
+      border-top: 1px solid var(--border); /* Divider line between comments */
+      display: flex;
+      gap: 0.6rem;
+      align-items: flex-start;
+    }
+
+    /* Small accent dot shown next to each comment */
+    .comment-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--accent);  /* Green dot */
+      flex-shrink: 0;
+      margin-top: 0.55rem;
+    }
+
+    /* The comment text bubble */
+    .comment-bubble {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 0 10px 10px 10px; /* Flat top-left so it looks like it points to avatar */
+      padding: 0.35rem 0.7rem;
+      font-size: 0.76rem;
+      color: #ddd;
+      line-height: 1.5;
+      flex: 1;                  /* Stretches to fill remaining width */
+      position: relative;
+    }
+
+    /* The little triangle tail on the comment bubble */
+    .comment-bubble::before {
+      content: '';
+      position: absolute;
+      top: 0; left: -5px;
+      border-width: 0 5px 5px 0; /* CSS triangle trick using borders */
+      border-style: solid;
+      border-color: transparent var(--border) transparent transparent;
+    }
+
+    /* Row at the bottom: input field + Post button */
+    .comment-input-row {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 0.75rem;
+      align-items: center;
+    }
+
+    /* The text input where you type a comment */
+    .comment-input {
+      flex: 1;                  /* Takes up all remaining space */
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 0.45rem 1rem;
+      font-size: 0.78rem;
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      outline: none;            /* Removes the default browser blue focus ring */
+      transition: border-color 0.2s;
+    }
+    .comment-input:focus { border-color: var(--accent); } /* Green border while typing */
+    .comment-input::placeholder { color: var(--muted); }  /* Dimmed placeholder text */
+
+    /* The "Post" submit button */
+    .comment-submit {
+      background: var(--accent); /* Solid green */
+      border: none;
+      border-radius: 20px;
+      padding: 0.45rem 1rem;
+      font-size: 0.72rem;
+      font-weight: 500;
+      color: #000;               /* Black text on green background */
+      cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+      transition: opacity 0.2s;
+      white-space: nowrap;       /* Prevents button text from wrapping to two lines */
+    }
+    .comment-submit:hover { opacity: 0.85; } /* Slightly fades on hover */
+
+    /* =============================================
+       EMPTY STATE — shown when there are no posts
+    ============================================= */
+    .empty-state {
+      text-align: center;
+      padding: 4rem 2rem;
+      color: var(--muted);
+      font-size: 0.85rem;
+      display: none;             /* Hidden by default — JS shows it when needed */
+    }
+    .empty-state .big { font-size: 3rem; margin-bottom: 1rem; display: block; }
+
+    /* =============================================
+       APPLAUDED TAB — empty state message
+    ============================================= */
+    .applauded-empty {
+      text-align: center;
+      padding: 5rem 2rem;
+      color: var(--muted);
+    }
+    .applauded-empty span { font-size: 3rem; display: block; margin-bottom: 1rem; }
+
+    /* =============================================
+       FOOTER — bottom bar with page name and date
+    ============================================= */
+    footer {
+      margin-top: 4rem;
+      padding: 1.25rem 3rem;
+      border-top: 1px solid var(--border);
+      font-size: 0.68rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      display: flex;
+      justify-content: space-between; /* Name on left, date on right */
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- =============================================
+       HEADER — sticky top navigation bar
+  ============================================= -->
+  <header>
+    <a href="index.html" class="back-btn">← Home</a>
+    <!-- Clicking this returns the user to index.html (the main nav page) -->
+
+    <div class="page-title">My <span>Strike</span></div>
+    <!-- "Strike" is in a <span> so CSS can color just that word green -->
+
+    <div class="tab-switcher">
+      <!-- Feed tab: shows all uploaded posts. active class = currently selected -->
+      <button class="tab-btn active" onclick="showTab('feed')">Feed</button>
+      <!-- Applauded tab: shows only posts you have applauded -->
+      <button class="tab-btn" onclick="showTab('applauded')">👏 Applauded</button>
+    </div>
+  </header>
+
+  <!-- =============================================
+       MAIN CONTENT AREA
+  ============================================= -->
+  <main>
+
+    <!-- FEED VIEW — shown by default when page loads -->
+    <div id="feed-view">
+
+      <!-- Upload zone — user clicks or drags files here -->
+      <div class="upload-zone" id="uploadZone">
+
+        <!-- Hidden file input: accepts images and videos, allows selecting multiple at once -->
+        <!-- onchange fires when files are selected, passing them to handleFiles() -->
+        <input type="file" id="fileInput" accept="image/*,video/*" multiple onchange="handleFiles(this.files)">
+
+        <span class="upload-icon">⚡</span>
+        <div style="font-size:1rem; font-weight:500; margin-bottom:0.4rem;">Drop your strike here</div>
+        <div class="upload-label">Drag & drop or <strong>click to upload</strong> — images or videos</div>
+      </div>
+
+      <div class="section-label">All Posts</div>
+      <!-- Section heading above the posts grid -->
+
+      <div class="posts-grid" id="postsGrid"></div>
+      <!-- This starts empty — JavaScript fills it with post cards dynamically -->
+
+      <!-- Shown only when there are zero posts in the grid -->
+      <div class="empty-state" id="emptyState">
+        <span class="big">📭</span>
+        No posts yet — upload something above!
+      </div>
+
+    </div>
+    <!-- end #feed-view -->
+
+    <!-- APPLAUDED VIEW — hidden until the Applauded tab is clicked -->
+    <div id="applauded-view">
+      <div class="section-label">Posts You Applauded</div>
+
+      <div class="posts-grid" id="applaudedGrid"></div>
+      <!-- JavaScript fills this with only the posts where applauded = true -->
+
+      <!-- Shown when no posts have been applauded yet -->
+      <div class="applauded-empty" id="applaudedEmpty">
+        <span>👏</span>
+        Nothing applauded yet — go give some love!
+      </div>
+    </div>
+    <!-- end #applauded-view -->
+
+  </main>
+
+  <!-- =============================================
+       FOOTER — bottom of the page
+  ============================================= -->
+  <footer>
+    <span>My Strike</span>
+    <span id="foot-date"></span>
+    <!-- foot-date is filled in by JavaScript with today's date -->
+  </footer>
+
+ <LINK rel="scripts" href="script.js">
+  
+</body>
+
+</html>

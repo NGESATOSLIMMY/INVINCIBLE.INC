@@ -1,10 +1,9 @@
-  *, *::before, *::after { 
+*,*::before,*::after {
     margin: 0;
      padding: 0; 
      box-sizing: border-box;
      }
-
-body {
+body{
     font-family: 'DM Sans', sans-serif;
     background: #0e0e0e;
     color: #f0ede6;
@@ -12,44 +11,37 @@ body {
     display: flex;
     flex-direction: column;
   }
-
-  
- 
-  header {
+header{
     padding: 3rem 4rem 2rem;
     border-bottom: 1px solid #2a2a2a;
     display: flex;
     align-items: flex-end;
     justify-content: space-between;
   }
-  .logo {
+.logo{
     font-family: 'Bebas Neue', cursive;
     font-size: 2.5rem;
     color: #f0ede6;
     letter-spacing: 0.05em;
     line-height: 1;
+}
+  .logo span{
+    color: #c8ff00;
   }
-
-    .logo span {
-        color: #ff6f61;
-    }
-    .tagline {
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: #555;
-    padding-bottom: 0.5rem;
-    }
-    main {
-        flex: 1;
-        display: grid;
-        align-items: center;
-        grid-template-columns: repeat(4, 1fr);
-        gap: 0;
-        padding: 4rem;
-    }
-
-    .nav-card {
-            display: flex;
+ .tagline{
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #555;
+  padding-bottom: 0.5rem;
+ }
+main{
+    flex: 1;
+    display: grid;
+    align-items: center;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0; }
+ .nav-card{
+    display: flex;
     flex-direction: column;
     justify-content: space-between;
     padding: 3rem 2.5rem;
@@ -61,11 +53,9 @@ body {
     min-height: 65vh;
     transition: background 0.3s ease;
     cursor: pointer;
-  }
-
-    .nav-card:last-child { border-right: none; }
-
-    .nav-card::before {
+ }   
+.nav-card:last-child{ border-right: none; }    
+.nav-card::before{
     content: '';
     position: absolute;
     top: 0; left: 0; right: 0;
@@ -74,45 +64,56 @@ body {
     transform: scaleX(0);
     transform-origin: left;
     transition: transform 0.35s ease;
-  }
-    .nav-card:hover::before { 
-        transform: scaleX(1); 
-    }
-    .nav-card:hover {
-         background: #161616; 
-        }
-    .nav-card:hover .card-number {
-         color: #c8ff00;
-         }
-    .nav-card:hover .card-arrow {
-     transform: translate(4px, -4px); color: #c8ff00; 
-    }
-      .card-number {
+}
+.nav-card:hover::before {
+    transform: scaleX(1);
+} 
+.nav-card:hover {
+    background: #161616;
+}
+.nav-card:hover .card-number{
+    color: #c8ff00; 
+}      
+.nav-card:hover .card-label { color: #c8ff00; 
+    } 
+.nav-card:hover .card-arrow{
+      color: #c8ff00; 
+      transform: translate(4px, -4px); 
+}
+.card-number{
     font-family: 'Bebas Neue', sans-serif;
     font-size: 5rem;
     color: #2a2a2a;
     line-height: 1;
     transition: color 0.3s ease;
-    user-select: none;
-  }
-
-  .card-bottom { display: flex; flex-direction: column; gap: 0.5rem; }
-
-  .card-label {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 2rem;
-    letter-spacing: 0.06em;
-    line-height: 1;
-    color: #f0ede6;
-  }
-
-  .card-file {
+     user-select: none;
+}
+.card-bottom{
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;}
+.card-label-row{
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+.card-label{
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 2rem;
+      letter-spacing: 0.06em;
+      line-height: 1;
+      color: #f0ede6;
+}
+.card-file {
     font-size: 0.7rem;
     letter-spacing: 0.15em;
     text-transform: uppercase;
     color: #444;
   }
-
+.card-arrow-row {
+    display: flex;
+    justify-content: flex-end;
+}
   .card-arrow {
     font-size: 1.2rem;
     color: #333;
@@ -120,38 +121,31 @@ body {
     align-self: flex-end;
     margin-top: 0.5rem;
   }
-
-footer {
-    padding: 1.5rem 4rem;
-    border-top: 1px solid #2a2a2a;
-    display: flex;
-    justify-content: space-between;
-    font-size: 0.7rem;
-    color: #333;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-  }
-
-  @keyframes fadeUp {
+footer{
+  padding:1.5rem 4rem;
+  border-top:1px solid #2a2a2a;
+  display:flex;
+  justify-content:space-between;
+  font-size:0.7rem;
+  color:#333;
+  letter-spacing:0.1em;
+  text-transform:uppercase;
+}
+ @keyframes fadeup {
     from { opacity: 0; transform: translateY(20px); }
     to   { opacity: 1; transform: translateY(0); }
   }
-
-  .nav-card {
-    animation: fadeUp 0.5s ease both;
+.nav-card {
+    animation: fadeup 0.5s ease both;
   }
-  .nav-card:nth-child(1) { animation-delay: 0.05s; }
-  .nav-card:nth-child(2) { animation-delay: 0.15s; }
-  .nav-card:nth-child(3) { animation-delay: 0.25s; }
+.nav-card:nth-child(1) { animation-delay: 0.05s; }
+.nav-card:nth-child(2) { animation-delay: 0.15s; }
+.nav-card:nth-child(3) { animation-delay: 0.25s; }
 
+  /*MY strikes*/
+/* Reset default margins, paddings, and set box-sizing to border-box for easier layout */
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
-  /*EXPOSED PAGE*/
-    /* =============================================
-       RESET — removes default browser spacing
-       so everything starts from zero
-    ============================================= */
-    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
- 
     /* =============================================
        COLOR VARIABLES — defined once here,
        used everywhere with var(--name).
@@ -167,7 +161,7 @@ footer {
       --accent: #c8ff00;                   /* Bright green highlight color */
       --accent-dim: rgba(200,255,0,0.1);   /* Transparent accent for backgrounds */
     }
- 
+
     /* =============================================
        BODY — base styles for the whole page
     ============================================= */
@@ -177,7 +171,7 @@ footer {
       color: var(--text);                 /* Off-white text */
       min-height: 100vh;                  /* Page is at least full screen tall */
     }
- 
+
     /* =============================================
        HEADER — the top bar with title and tabs
     ============================================= */
@@ -192,7 +186,7 @@ footer {
       background: var(--bg);                  /* Same dark bg so content scrolls under it */
       z-index: 100;                           /* Sits above all other content */
     }
- 
+
     /* Back button — links back to index.html */
     .back-btn {
       font-size: 0.7rem;
@@ -203,7 +197,7 @@ footer {
       transition: color 0.2s;    /* Smooth color change on hover */
     }
     .back-btn:hover { color: var(--accent); } /* Turns green when hovered */
- 
+
     /* Page title "My Strike" */
     .page-title {
       font-family: 'Bebas Neue', sans-serif; /* Bold display font */
@@ -211,7 +205,7 @@ footer {
       letter-spacing: 0.08em;
     }
     .page-title span { color: var(--accent); } /* The word "Strike" gets green color */
- 
+
     /* Tab switcher — holds the Feed and Applauded buttons side by side */
     .tab-switcher {
       display: flex;
@@ -220,7 +214,7 @@ footer {
       border-radius: 6px;
       overflow: hidden;          /* Clips the buttons to the rounded corners */
     }
- 
+
     /* Individual tab buttons */
     .tab-btn {
       padding: 0.5rem 1.25rem;
@@ -234,20 +228,20 @@ footer {
       font-family: 'DM Sans', sans-serif;
       transition: background 0.2s, color 0.2s;
     }
- 
+
     /* The currently selected / active tab */
     .tab-btn.active {
       background: var(--accent); /* Green background */
       color: #000;               /* Black text on green */
       font-weight: 500;
     }
- 
+
     /* =============================================
        MAIN — content area below the header
     ============================================= */
     main { padding: 2.5rem 3rem; max-width: 1100px; margin: 0 auto; }
     /* max-width + margin auto = centered column with maximum width 1100px */
- 
+
     /* =============================================
        UPLOAD ZONE — the drag and drop area
     ============================================= */
@@ -261,28 +255,28 @@ footer {
       margin-bottom: 2.5rem;
       position: relative;        /* Needed so the hidden file input can overlay it */
     }
- 
+
     /* Style when hovering over the zone or actively dragging a file onto it */
     .upload-zone:hover, .upload-zone.dragover {
       border-color: var(--accent); /* Border turns green */
       background: var(--accent-dim); /* Faint green glow behind it */
     }
- 
+
     /* Hidden file input — invisible but covers the whole zone so clicking works */
     .upload-zone input[type=file] {
       position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%;
     }
- 
+
     .upload-icon { font-size: 2.5rem; margin-bottom: 0.75rem; display: block; }
     .upload-label { font-size: 0.85rem; color: var(--muted); }
     .upload-label strong { color: var(--accent); font-weight: 500; }
- 
+
     /* =============================================
        FEED VIEWS — controls which tab is visible
     ============================================= */
     #feed-view { display: block; }    /* Feed tab shown by default */
     #applauded-view { display: none; } /* Applauded tab hidden by default */
- 
+
     /* Small uppercase label above a section e.g. "All Posts" */
     .section-label {
       font-size: 0.68rem;
@@ -301,7 +295,7 @@ footer {
       height: 1px;
       background: var(--border);
     }
- 
+
     /* =============================================
        POSTS GRID — responsive card layout
     ============================================= */
@@ -312,7 +306,7 @@ footer {
          minmax(300px, 1fr): each column is at least 300px, grows equally */
       gap: 1.5rem; /* Space between cards */
     }
- 
+
     /* =============================================
        POST CARD — each uploaded photo or video
     ============================================= */
@@ -325,13 +319,13 @@ footer {
       animation: fadeUp 0.4s ease both; /* Plays the fade-in animation when card appears */
     }
     .post-card:hover { border-color: #3a3a3a; } /* Brighter border on hover */
- 
+
     /* Fade-up animation — cards slide up from below and fade in when added */
     @keyframes fadeUp {
       from { opacity: 0; transform: translateY(16px); } /* Start: invisible, shifted down */
       to   { opacity: 1; transform: translateY(0); }     /* End: fully visible, normal position */
     }
- 
+
     /* Media container — keeps image/video at a fixed 16:10 ratio */
     .media-wrap {
       position: relative;       /* Lets the badge and delete button be placed inside */
@@ -339,14 +333,14 @@ footer {
       aspect-ratio: 16/10;      /* Maintains width-to-height ratio */
       overflow: hidden;
     }
- 
+
     /* The actual image or video element inside the card */
     .media-wrap img, .media-wrap video {
       width: 100%; height: 100%;
       object-fit: cover;        /* Fills the space, crops edges if needed */
       display: block;
     }
- 
+
     /* Small "image" or "video" label in the top-right corner */
     .media-type-badge {
       position: absolute;       /* Floats over the media */
@@ -359,7 +353,7 @@ footer {
       padding: 3px 8px;
       border-radius: 4px;
     }
- 
+
     /* Red X delete button — appears in the top-left corner on hover */
     .delete-btn {
       position: absolute;
@@ -376,10 +370,10 @@ footer {
       transition: opacity 0.2s;
     }
     .post-card:hover .delete-btn { opacity: 1; } /* Appears when card is hovered */
- 
+
     /* Card body — the area below the media thumbnail */
     .post-body { padding: 1rem 1.25rem; }
- 
+
     /* Shows the filename and upload date under the media */
     .post-meta {
       font-size: 0.68rem;
@@ -387,7 +381,7 @@ footer {
       letter-spacing: 0.08em;
       margin-bottom: 0.75rem;
     }
- 
+
     /* =============================================
        APPLAUD BUTTON ROW
     ============================================= */
@@ -397,7 +391,7 @@ footer {
       gap: 0.75rem;
       margin-bottom: 0.85rem;
     }
- 
+
     /* The applaud button itself */
     .applaud-btn {
       display: flex;
@@ -425,12 +419,12 @@ footer {
       font-weight: 500;
     }
     .applaud-btn .clap-icon { font-size: 1rem; }
- 
+
     /* =============================================
        COMMENTS SECTION
     ============================================= */
     .comments-section { margin-top: 0.6rem; }
- 
+
     /* A single comment row */
     .comment-item {
       font-size: 0.78rem;
@@ -442,7 +436,7 @@ footer {
       gap: 0.6rem;
       align-items: flex-start;
     }
- 
+
     /* Small accent dot shown next to each comment */
     .comment-dot {
       width: 6px; height: 6px;
@@ -451,7 +445,7 @@ footer {
       flex-shrink: 0;
       margin-top: 0.55rem;
     }
- 
+
     /* The comment text bubble */
     .comment-bubble {
       background: var(--surface2);
@@ -464,7 +458,7 @@ footer {
       flex: 1;                  /* Stretches to fill remaining width */
       position: relative;
     }
- 
+
     /* The little triangle tail on the comment bubble */
     .comment-bubble::before {
       content: '';
@@ -474,7 +468,7 @@ footer {
       border-style: solid;
       border-color: transparent var(--border) transparent transparent;
     }
- 
+
     /* Row at the bottom: input field + Post button */
     .comment-input-row {
       display: flex;
@@ -482,7 +476,7 @@ footer {
       margin-top: 0.75rem;
       align-items: center;
     }
- 
+
     /* The text input where you type a comment */
     .comment-input {
       flex: 1;                  /* Takes up all remaining space */
@@ -498,7 +492,7 @@ footer {
     }
     .comment-input:focus { border-color: var(--accent); } /* Green border while typing */
     .comment-input::placeholder { color: var(--muted); }  /* Dimmed placeholder text */
- 
+
     /* The "Post" submit button */
     .comment-submit {
       background: var(--accent); /* Solid green */
@@ -514,7 +508,7 @@ footer {
       white-space: nowrap;       /* Prevents button text from wrapping to two lines */
     }
     .comment-submit:hover { opacity: 0.85; } /* Slightly fades on hover */
- 
+
     /* =============================================
        EMPTY STATE — shown when there are no posts
     ============================================= */
@@ -526,7 +520,7 @@ footer {
       display: none;             /* Hidden by default — JS shows it when needed */
     }
     .empty-state .big { font-size: 3rem; margin-bottom: 1rem; display: block; }
- 
+
     /* =============================================
        APPLAUDED TAB — empty state message
     ============================================= */
@@ -536,7 +530,7 @@ footer {
       color: var(--muted);
     }
     .applauded-empty span { font-size: 3rem; display: block; margin-bottom: 1rem; }
- 
+
     /* =============================================
        FOOTER — bottom bar with page name and date
     ============================================= */
