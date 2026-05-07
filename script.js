@@ -1,272 +1,935 @@
-  // Load saved posts or start fresh
-    let posts = JSON.parse(localStorage.getItem('ms_posts') || '[]');
-    const save = () => { try { localStorage.setItem('ms_posts', JSON.stringify(posts)); } catch(e) {} };
-    const find = id => posts.find(p => p.id === id);
-    const esc  = s  => s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
- 
-    // Upload: read file as base64 and add to posts
-    function handleFiles(files) {
-      [...files].forEach(file => {
-        const r = new FileReader();
-        r.onload = e => {
-          posts.unshift({ id: crypto.randomUUID(), name: file.name,
-            type: file.type.startsWith('video') ? 'video' : 'image',
-            date: new Date().toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}),
-            applauded: false, claps: 0, comments: [], src: e.target.result });
-          save(); renderFeed();
-        };
-        r.readAsDataURL(file);
-      });
-    }
- 
-    // Drag & drop
-    const zone = document.getElementById('uploadZone');
-    zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('dragover'); });
-    zone.addEventListener('dragleave', () => zone.classList.remove('dragover'));
-    zone.addEventListener('drop', e => { e.preventDefault(); zone.classList.remove('dragover'); handleFiles(e.dataTransfer.files); });
- 
-    // Render posts into a grid
-    function renderGrid(gridId, emptyId, list) {
-      const grid = document.getElementById(gridId);
-      document.getElementById(emptyId).style.display = list.length ? 'none' : 'block';
-      grid.innerHTML = list.map((p, i) => cardHTML(p, i, gridId === 'applaudedGrid')).join('');
-    }
- 
-    function renderFeed()      { renderGrid('postsGrid',    'emptyState',    posts); }
-    function renderApplauded() { renderGrid('applaudedGrid','applaudedEmpty', posts.filter(p => p.applauded)); }
- 
-    // Build card HTML as a string (simple and readable)
-    function cardHTML(p, i, readonly) {
-      const media    = p.type === 'video' ? `<video src="${p.src}" controls></video>` : `<img src="${p.src}" loading="lazy">`;
-      const comments = p.comments.map(c => `<div class="comment-item"><div class="comment-dot"></div><div class="comment-bubble">${esc(c)}</div></div>`).join('');
-      const delBtn   = readonly ? '' : `<button class="delete-btn" onclick="deletePost('${p.id}')">✕</button>`;
-      return `
-        <div class="post-card" style="animation-delay:${i*0.06}s">
-          <div class="media-wrap">${media}<span class="media-type-badge">${p.type}</span>${delBtn}</div>
-          <div class="post-body">
-            <div class="post-meta">${p.name} · ${p.date}</div>
-            <button class="applaud-btn ${p.applauded?'applauded':''}" onclick="toggleApplaud('${p.id}',this)">
-              👏 <span>${p.applauded?'Applauded':'Applaud'}</span> <span>${p.claps||''}</span>
-            </button>
-            <div class="comments-section" id="comments-${p.id}">${comments}</div>
-            <div class="comment-input-row">
-              <input class="comment-input" id="cinput-${p.id}" placeholder="Add a comment…" onkeydown="if(event.key==='Enter')submitComment('${p.id}')">
-              <button class="comment-submit" onclick="submitComment('${p.id}')">Post</button>
-            </div>
-          </div>
-        </div>`;
-    }
- 
-    // Applaud toggle
-    function toggleApplaud(id, btn) {
-      const p = find(id); if (!p) return;
-      p.applauded = !p.applauded;
-      p.claps += p.applauded ? 1 : -1;
-      save();
-      btn.classList.toggle('applauded', p.applauded);
-      btn.querySelectorAll('span')[0].textContent = p.applauded ? 'Applauded' : 'Applaud';
-      btn.querySelectorAll('span')[1].textContent = p.claps || '';
-      btn.style.transform = 'scale(1.15)';
-      setTimeout(() => btn.style.transform = '', 200);
-    }
- 
-    // Add comment
-    function submitComment(id) {
-      const input = document.getElementById('cinput-' + id);
-      const text = input.value.trim(); if (!text) return;
-      const p = find(id); if (!p) return;
-      p.comments.push(text); save(); input.value = '';
-      document.getElementById('comments-' + id).insertAdjacentHTML('beforeend',
-        `<div class="comment-item" style="animation:fadeUp .3s ease both"><div class="comment-dot"></div><div class="comment-bubble">${esc(text)}</div></div>`);
-    }
- 
-    // Delete post
-    function deletePost(id) {
-      if (!confirm('Delete?')) return;
-      posts = posts.filter(p => p.id !== id);
-      save(); renderFeed();
-    }
- 
-    // Switch tabs
-    function showTab(tab) {
-      document.querySelectorAll('.tab-btn').forEach((b,i) => b.classList.toggle('active', i === (tab==='feed'?0:1)));
-      document.getElementById('feed-view').style.display      = tab==='feed'      ? 'block':'none';
-      document.getElementById('applauded-view').style.display = tab==='applauded' ? 'block':'none';
-      if (tab === 'applauded') renderApplauded();
-    }
- 
-    // Init
-    document.getElementById('foot-date').textContent = new Date().toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});
-    renderFeed();
-  
+// ============================================
+// SHORTCUT FUNCTION
+// ============================================
+const $ = id => document.getElementById(id);
 
 
-    //EXPOSED PAGE - simple static HTML with no JS, just to show the "exposed" media in a grid. The real "exposure" is that these files are accessible directly via their base64 URLs, which can be shared or viewed outside the app.
-     const $ = id => document.getElementById(id);
-  let all = [], filter = 'all';
 
-  function load() {
-    all = JSON.parse(localStorage.getItem('ms_posts') || '[]').filter(p => p.applauded);
-    $('total-count').textContent = all.length;
-    render();
+// ============================================
+// ESCAPE HTML
+// PREVENTS HTML INJECTION
+// ============================================
+function esc(text) {
+
+  return String(text)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+
+}
+
+
+
+// ============================================
+// LOAD POSTS FROM LOCAL STORAGE
+// ============================================
+let posts = [];
+
+try {
+
+  posts = JSON.parse(
+    localStorage.getItem('ms_posts')
+  ) || [];
+
+} catch (error) {
+
+  posts = [];
+
+}
+
+
+
+// ============================================
+// SAVE POSTS TO LOCAL STORAGE
+// ============================================
+function savePosts() {
+
+  localStorage.setItem(
+    'ms_posts',
+    JSON.stringify(posts)
+  );
+
+}
+
+
+
+// ============================================
+// GENERATE RANDOM ANONYMOUS USERNAME
+// ============================================
+function generateAnonName() {
+
+  const names = [
+
+    'Shadow',
+    'Ghost',
+    'Citizen',
+    'Justice',
+    'Watcher',
+    'Freedom',
+    'Truth',
+    'Panther',
+    'Falcon',
+    'Storm',
+    'Lion',
+    'Rebel'
+
+  ];
+
+  const randomName =
+    names[
+      Math.floor(
+        Math.random() * names.length
+      )
+    ];
+
+  const randomNumber =
+    Math.floor(
+      100 + Math.random() * 900
+    );
+
+  return `${randomName}${randomNumber}`;
+
+}
+
+
+
+// ============================================
+// CREATE POST
+// ============================================
+function createPost(data) {
+
+  posts.unshift({
+
+    id: crypto.randomUUID(),
+
+    title: data.title,
+
+    cat: data.cat,
+
+    loc: data.loc,
+
+    desc: data.desc,
+
+    urgency: data.urgency,
+
+    reporter:
+      data.reporter || 'Anonymous',
+
+    date:
+      new Date().toLocaleDateString(
+        'en-GB',
+        {
+          day: '2-digit',
+          month: 'short',
+          year: 'numeric'
+        }
+      ),
+
+    applauded: false,
+
+    claps: 0,
+
+    comments: [],
+
+    src: data.src || null,
+
+    type: data.type || null
+
+  });
+
+  savePosts();
+
+}
+
+
+
+// ============================================
+// DELETE POST
+// ============================================
+function deletePost(id) {
+
+  const confirmDelete = confirm(
+    'Delete this strike?'
+  );
+
+  if (!confirmDelete) return;
+
+  posts = posts.filter(
+    post => post.id !== id
+  );
+
+  savePosts();
+
+  renderPosts();
+
+}
+
+
+
+// ============================================
+// APPLAUD POST
+// ============================================
+function toggleApplaud(id) {
+
+  const post = posts.find(
+    p => p.id === id
+  );
+
+  if (!post) return;
+
+  post.applauded = !post.applauded;
+
+  if (post.applauded) {
+
+    post.claps++;
+
+  } else {
+
+    post.claps--;
+
+    if (post.claps < 0) {
+
+      post.claps = 0;
+
+    }
+
   }
 
-  function setFilter(type, btn) {
-    filter = type;
-    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    render();
-  }
+  savePosts();
 
-  function render() {
-    const list = filter === 'all' ? all : all.filter(p => p.type === filter);
-    $('empty').style.display = list.length ? 'none' : 'block';
-    $('gallery').innerHTML = list.map((p, i) => `
-      <div class="gallery-item" style="animation-delay:${i*0.05}s" onclick="openLightbox(${i}, '${filter}')">
-        ${p.type === 'video'
-          ? `<video src="${p.src}" muted loop onmouseenter="this.play()" onmouseleave="this.pause()"></video><div class="video-badge">▶ video</div>`
-          : `<img src="${p.src}" loading="lazy">`}
-        <div class="gallery-overlay">
-          <div class="overlay-name">${p.name}</div>
-          <div class="overlay-meta">
-            <span class="overlay-claps">👏 ${p.claps}</span>
-            <span class="overlay-type">${p.type}</span>
-            ${p.comments.length ? `<span class="overlay-comments">💬 ${p.comments.length}</span>` : ''}
+  renderPosts();
+
+}
+
+
+
+// ============================================
+// SUBMIT COMMENT
+// ============================================
+function submitComment(id) {
+
+  const input =
+    document.getElementById(
+      `comment-${id}`
+    );
+
+  if (!input) return;
+
+  const text =
+    input.value.trim();
+
+  if (!text) return;
+
+
+
+  const post =
+    posts.find(
+      p => p.id === id
+    );
+
+  if (!post) return;
+
+
+
+  // ==========================================
+  // COMMENT OBJECT
+  // ==========================================
+  const commentData = {
+
+    username:
+      generateAnonName(),
+
+    text:
+
+      text,
+
+    date:
+      new Date().toLocaleDateString(
+        'en-GB',
+        {
+          day: '2-digit',
+          month: 'short',
+          year: 'numeric'
+        }
+      )
+
+  };
+
+
+
+  // ==========================================
+  // PUSH COMMENT
+  // ==========================================
+  post.comments.push(
+    commentData
+  );
+
+
+
+  savePosts();
+
+  input.value = '';
+
+  renderPosts();
+
+}
+
+
+
+// ============================================
+// POST CARD HTML
+// ============================================
+function postHTML(post) {
+
+  // ==========================================
+  // MEDIA SECTION
+  // ==========================================
+  let media = '';
+
+
+
+  // ==========================================
+  // IF MEDIA EXISTS
+  // ==========================================
+  if (post.src) {
+
+
+
+    // ========================================
+    // VIDEO
+    // ========================================
+    if (post.type === 'video') {
+
+      media = `
+
+        <div
+          style="
+            position:relative;
+            overflow:hidden;
+          ">
+
+          <video
+            src="${post.src}"
+            controls
+            style="
+              width:100%;
+              height:260px;
+              object-fit:cover;
+              display:block;
+            ">
+          </video>
+
+          <div
+            style="
+              position:absolute;
+              top:12px;
+              right:12px;
+              background:rgba(0,0,0,.75);
+              color:white;
+              padding:.35rem .7rem;
+              border-radius:999px;
+              font-size:.7rem;
+              font-weight:bold;
+            ">
+
+            🎥 VIDEO
+
           </div>
+
         </div>
-      </div>`).join('');
-  }
 
-  function openLightbox(i, f) {
-    const p = (f === 'all' ? all : all.filter(x => x.type === f))[i];
-    $('lb-name').textContent = p.name;
-    $('lb-claps').textContent = `👏 ${p.claps} clap${p.claps !== 1 ? 's' : ''}`;
-    $('lb-date').textContent = p.date;
-    $('lb-media').innerHTML = p.type === 'video'
-      ? `<video src="${p.src}" class="lightbox-media" controls></video>`
-      : `<img src="${p.src}" class="lightbox-media">`;
-    $('lb-comments').innerHTML = p.comments.map(c => `<div class="lb-comment">${c}</div>`).join('');
-    $('lightbox').classList.add('open');
-  }
+      `;
 
-  function closeLightbox(e) {
-    if (!e || e.target === $('lightbox') || e.target.classList.contains('lightbox-close')) {
-      $('lightbox').classList.remove('open');
-      $('lb-media').innerHTML = '';
     }
-  }
 
-  document.addEventListener('keydown', e => e.key === 'Escape' && closeLightbox());
-  document.addEventListener('visibilitychange', () => !document.hidden && load());
-  $('foot-date').textContent = new Date().toLocaleDateString('en-GB', {day:'2-digit',month:'short',year:'numeric'});
-  load();
 
-  //MOVEMENT.JS///
-  
-  const $ = id => document.getElementById(id);
-  const esc = s => s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-  let posts = JSON.parse(localStorage.getItem('mv_posts') || '[]');
-  let pending = [];
 
-  const save = () => { try { localStorage.setItem('mv_posts', JSON.stringify(posts)); } catch(e) {} };
+    // ========================================
+    // IMAGE
+    // ========================================
+    else {
 
-  // File picked — open modal for title/category
-  function openModal(files) {
-    pending = [...files];
-    $('m-title').value = ''; $('m-desc').value = ''; $('m-cat').value = 'strike';
-    $('modalOverlay').classList.add('open');
-    $('fileInput').value = '';
-  }
+      media = `
 
-  function cancelModal() { pending = []; $('modalOverlay').classList.remove('open'); }
+        <div
+          style="
+            position:relative;
+            overflow:hidden;
+          ">
 
-  function confirmPost() {
-    const title = $('m-title').value.trim() || 'Untitled Action';
-    const cat = $('m-cat').value, desc = $('m-desc').value.trim();
-    $('modalOverlay').classList.remove('open');
-    pending.forEach(file => {
-      const r = new FileReader();
-      r.onload = e => {
-        posts.unshift({ id: crypto.randomUUID(), name: file.name, title, cat, desc,
-          type: file.type.startsWith('video') ? 'video' : 'image',
-          date: new Date().toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}),
-          applauded: false, claps: 0, comments: [], src: e.target.result });
-        save(); renderFeed();
-      };
-      r.readAsDataURL(file);
-    });
-    pending = [];
-  }
+          <img
+            src="${post.src}"
+            alt="Strike image"
+            style="
+              width:100%;
+              height:260px;
+              object-fit:cover;
+              display:block;
+            ">
 
-  // Drag & drop
-  const zone = $('uploadZone');
-  zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('dragover'); });
-  zone.addEventListener('dragleave', () => zone.classList.remove('dragover'));
-  zone.addEventListener('drop', e => { e.preventDefault(); zone.classList.remove('dragover'); openModal(e.dataTransfer.files); });
+          <div
+            style="
+              position:absolute;
+              top:12px;
+              right:12px;
+              background:rgba(0,0,0,.75);
+              color:white;
+              padding:.35rem .7rem;
+              border-radius:999px;
+              font-size:.7rem;
+              font-weight:bold;
+            ">
 
-  function cardHTML(p, i, readonly) {
-    const media = p.type === 'video' ? `<video src="${p.src}" controls></video>` : `<img src="${p.src}" loading="lazy">`;
-    const comments = p.comments.map(c => `<div class="comment-item"><span class="comment-dash">—</span><span class="comment-text">${esc(c)}</span></div>`).join('');
-    return `
-      <div class="post-card" style="animation-delay:${i*0.07}s">
-        <div class="video-wrap">${media}
-          <span class="cat-badge cat-${p.cat}">${p.cat}</span>
-          ${!readonly ? `<button class="delete-btn" onclick="deletePost('${p.id}')">✕</button>` : ''}
-        </div>
-        <div class="post-body">
-          <div class="post-header">
-            <div class="post-title">${esc(p.title)}</div>
-            <div class="post-meta">${p.date}</div>
+            📸 PHOTO
+
           </div>
-          ${p.desc ? `<div class="post-desc">${esc(p.desc)}</div>` : ''}
-          <button class="applaud-btn ${p.applauded?'applauded':''}" onclick="toggleApplaud('${p.id}',this)">
-            ✊ <span>${p.applauded?'Applauded':'Applaud'}</span> <span>${p.claps||''}</span>
+
+        </div>
+
+      `;
+
+    }
+
+  }
+
+
+
+  // ==========================================
+  // COMMENTS HTML
+  // ==========================================
+  const commentsHTML =
+    post.comments.map(comment => `
+
+      <div
+        style="
+          background:#111;
+          border:1px solid #222;
+          padding:.8rem;
+          border-radius:8px;
+          margin-top:.7rem;
+        ">
+
+        <div
+          style="
+            display:flex;
+            justify-content:space-between;
+            margin-bottom:.4rem;
+          ">
+
+          <span
+            style="
+              color:#f5c300;
+              font-size:.78rem;
+              font-weight:bold;
+            ">
+
+            👤 ${esc(comment.username)}
+
+          </span>
+
+          <span
+            style="
+              color:#666;
+              font-size:.7rem;
+            ">
+
+            ${esc(comment.date)}
+
+          </span>
+
+        </div>
+
+        <div
+          style="
+            color:#ccc;
+            line-height:1.5;
+            font-size:.85rem;
+          ">
+
+          ${esc(comment.text)}
+
+        </div>
+
+      </div>
+
+    `).join('');
+
+
+
+  // ==========================================
+  // RETURN CARD
+  // ==========================================
+  return `
+
+    <div
+      style="
+        background:#161616;
+        border:1px solid #222;
+        border-radius:14px;
+        overflow:hidden;
+      ">
+
+      ${media}
+
+      <div style="padding:1.4rem;">
+
+        <div
+          style="
+            display:flex;
+            justify-content:space-between;
+            gap:1rem;
+            margin-bottom:1rem;
+          ">
+
+          <h2
+            style="
+              color:#f5c300;
+              font-size:1.35rem;
+            ">
+
+            ${esc(post.title)}
+
+          </h2>
+
+          <button
+            onclick="deletePost('${post.id}')"
+            style="
+              background:none;
+              border:none;
+              color:#e02020;
+              cursor:pointer;
+              font-size:1rem;
+            ">
+
+            ✕
+
           </button>
-          <div class="comments-section" id="comments-${p.id}">${comments}</div>
-          <div class="comment-input-row">
-            <input class="comment-input" id="cinput-${p.id}" placeholder="Speak out…" onkeydown="if(event.key==='Enter')submitComment('${p.id}')">
-            <button class="comment-submit" onclick="submitComment('${p.id}')">Post</button>
-          </div>
+
         </div>
-      </div>`;
+
+
+
+        <div
+          style="
+            color:#666;
+            font-size:.78rem;
+            margin-bottom:1rem;
+            line-height:1.5;
+          ">
+
+          ${esc(post.cat)}
+          •
+          ${esc(post.loc)}
+          •
+          ${esc(post.reporter)}
+          •
+          ${esc(post.date)}
+
+        </div>
+
+
+
+        <p
+          style="
+            color:#bbb;
+            line-height:1.7;
+            margin-bottom:1.2rem;
+          ">
+
+          ${esc(post.desc)}
+
+        </p>
+
+
+
+        <!-- APPLAUD BUTTON -->
+        <button
+          onclick="toggleApplaud('${post.id}')"
+          style="
+            background:${post.applauded ? '#f5c300' : 'transparent'};
+            color:${post.applauded ? '#000' : '#f5c300'};
+            border:1px solid #f5c300;
+            padding:.7rem 1.2rem;
+            border-radius:999px;
+            cursor:pointer;
+            font-weight:bold;
+            margin-bottom:1rem;
+          ">
+
+          👏 ${post.applauded ? 'Applauded' : 'Applaud'}
+
+          (${post.claps})
+
+        </button>
+
+
+
+        <!-- COMMENTS -->
+        <div>
+
+          ${commentsHTML}
+
+        </div>
+
+
+
+        <!-- COMMENT INPUT -->
+        <div
+          style="
+            display:flex;
+            gap:.6rem;
+            margin-top:1rem;
+          ">
+
+          <input
+            id="comment-${post.id}"
+            placeholder="Add a comment..."
+            style="
+              flex:1;
+              background:#0a0a0a;
+              border:1px solid #222;
+              border-radius:8px;
+              padding:.8rem;
+              color:white;
+            ">
+
+          <button
+            onclick="submitComment('${post.id}')"
+            style="
+              background:#f5c300;
+              border:none;
+              border-radius:8px;
+              padding:.8rem 1rem;
+              font-weight:bold;
+              cursor:pointer;
+            ">
+
+            Post
+
+          </button>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  `;
+
+}
+
+
+
+// ============================================
+// RENDER POSTS
+// ============================================
+function renderPosts() {
+
+  const feedGrid =
+    document.getElementById(
+      'postsGrid'
+    );
+
+  const movementGrid =
+    document.getElementById(
+      'movementGrid'
+    );
+
+  const exposedGrid =
+    document.getElementById(
+      'exposedGrid'
+    );
+
+
+
+  // ==========================================
+  // INDEX PAGE
+  // ==========================================
+  if (feedGrid) {
+
+    if (posts.length === 0) {
+
+      feedGrid.innerHTML = `
+
+        <div
+          style="
+            color:#777;
+            text-align:center;
+            padding:4rem;
+          ">
+
+          No strikes available yet.
+
+        </div>
+
+      `;
+
+    }
+
+    else {
+
+      feedGrid.innerHTML =
+        posts
+          .map(post => postHTML(post))
+          .join('');
+
+    }
+
   }
 
-  function renderGrid(gridId, emptyId, list) {
-    $(emptyId).style.display = list.length ? 'none' : 'block';
-    $(gridId).innerHTML = list.map((p,i) => cardHTML(p, i, gridId === 'applaudedGrid')).join('');
+
+
+  // ==========================================
+  // MOVEMENT PAGE
+  // ==========================================
+  if (movementGrid) {
+
+    if (posts.length === 0) {
+
+      movementGrid.innerHTML = `
+
+        <div
+          style="
+            color:#777;
+            text-align:center;
+            padding:4rem;
+          ">
+
+          No movement activity yet.
+
+        </div>
+
+      `;
+
+    }
+
+    else {
+
+      movementGrid.innerHTML =
+        posts
+          .map(post => postHTML(post))
+          .join('');
+
+    }
+
   }
 
-  function renderFeed()      { renderGrid('postsGrid',    'emptyState',    posts); }
-  function renderApplauded() { renderGrid('applaudedGrid','applaudedEmpty', posts.filter(p => p.applauded)); }
 
-  function toggleApplaud(id, btn) {
-    const p = posts.find(p => p.id === id); if (!p) return;
-    p.applauded = !p.applauded; p.claps += p.applauded ? 1 : -1; save();
-    btn.classList.toggle('applauded', p.applauded);
-    btn.querySelectorAll('span')[0].textContent = p.applauded ? 'Applauded' : 'Applaud';
-    btn.querySelectorAll('span')[1].textContent = p.claps || '';
-    btn.style.transform = 'scale(1.12)'; setTimeout(() => btn.style.transform = '', 180);
+
+  // ==========================================
+  // EXPOSED PAGE
+  // ==========================================
+  if (exposedGrid) {
+
+    const exposedPosts =
+      posts.filter(post =>
+
+        post.cat === 'Corruption' ||
+
+        post.cat === 'Police Brutality' ||
+
+        post.urgency === 'High'
+
+      );
+
+
+
+    if (exposedPosts.length === 0) {
+
+      exposedGrid.innerHTML = `
+
+        <div
+          style="
+            color:#777;
+            text-align:center;
+            padding:4rem;
+          ">
+
+          Nothing exposed yet.
+
+        </div>
+
+      `;
+
+    }
+
+    else {
+
+      exposedGrid.innerHTML =
+        exposedPosts
+          .map(post => postHTML(post))
+          .join('');
+
+    }
+
   }
 
-  function submitComment(id) {
-    const input = $('cinput-' + id), text = input.value.trim(); if (!text) return;
-    const p = posts.find(p => p.id === id); if (!p) return;
-    p.comments.push(text); save(); input.value = '';
-    $('comments-' + id).insertAdjacentHTML('beforeend',
-      `<div class="comment-item"><span class="comment-dash">—</span><span class="comment-text">${esc(text)}</span></div>`);
-  }
+}
 
-  function deletePost(id) {
-    if (!confirm('Delete this post?')) return;
-    posts = posts.filter(p => p.id !== id); save(); renderFeed();
-  }
 
-  function showTab(tab) {
-    document.querySelectorAll('.tab-btn').forEach((b,i) => b.classList.toggle('active', i === (tab==='feed'?0:1)));
-    $('feed-view').style.display      = tab === 'feed'      ? 'block' : 'none';
-    $('applauded-view').style.display = tab === 'applauded' ? 'block' : 'none';
-    if (tab === 'applauded') renderApplauded();
-  }
 
-  $('foot-date').textContent = new Date().toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});
-  renderFeed();
+// ============================================
+// FORM SUBMISSION
+// ============================================
+const reportForm =
+  document.getElementById(
+    'reportForm'
+  );
+
+
+
+if (reportForm) {
+
+  reportForm.addEventListener(
+    'submit',
+    function(event) {
+
+      event.preventDefault();
+
+
+
+      // ======================================
+      // GET FORM VALUES
+      // ======================================
+      const title =
+        $('reportTitle').value.trim();
+
+      const cat =
+        $('category').value;
+
+      const loc =
+        $('location').value.trim();
+
+      const desc =
+        $('description').value.trim();
+
+      const reporter =
+        $('reporter').value.trim();
+
+      const urgency =
+        document.querySelector(
+          'input[name=\"urgency\"]:checked'
+        )?.value || 'Medium';
+
+
+
+      // ======================================
+      // VALIDATION
+      // ======================================
+      if (
+        !title ||
+        !cat ||
+        !loc ||
+        !desc
+      ) {
+
+        alert(
+          'Please fill all required fields.'
+        );
+
+        return;
+
+      }
+
+
+
+      // ======================================
+      // FILE HANDLING
+      // ======================================
+      const file =
+        $('fileInput')?.files[0];
+
+
+
+      // ======================================
+      // IF FILE EXISTS
+      // ======================================
+      if (file) {
+
+        const reader =
+          new FileReader();
+
+
+
+        reader.onload = function(e) {
+
+          createPost({
+
+            title,
+            cat,
+            loc,
+            desc,
+            urgency,
+            reporter,
+
+            src: e.target.result,
+
+            type:
+              file.type.startsWith(
+                'video'
+              )
+                ? 'video'
+                : 'image'
+
+          });
+
+
+
+          reportForm.reset();
+
+          renderPosts();
+
+          alert(
+            'Strike submitted successfully!'
+          );
+
+        };
+
+
+
+        reader.readAsDataURL(file);
+
+      }
+
+
+
+      // ======================================
+      // NO FILE
+      // ======================================
+      else {
+
+        createPost({
+
+          title,
+          cat,
+          loc,
+          desc,
+          urgency,
+          reporter
+
+        });
+
+
+
+        reportForm.reset();
+
+        renderPosts();
+
+        alert(
+          'Strike submitted successfully!'
+        );
+
+      }
+
+    }
+  );
+
+}
+
+
+
+// ============================================
+// INITIAL PAGE RENDER
+// ============================================
+renderPosts();

@@ -1,96 +1,144 @@
+<!-- ========================================= -->
+<!-- FILE: my strike.html -->
+<!-- ========================================= -->
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>My Strike</title>
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>RETALIATE | Strike</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@400;500;700&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="style.css">
+
 </head>
 
 <body>
 
-  <!-- =============================================
-       HEADER — sticky top navigation bar
-  ============================================= -->
-  <header>
-    <a href="index.html" class="back-btn">← Home</a>
-    <!-- Clicking this returns the user to index.html (the main nav page) -->
+<header>
 
-    <div class="page-title">My <span>Strike</span></div>
-    <!-- "Strike" is in a <span> so CSS can color just that word green -->
+<a href="index.html" class="logo">
+RETALIATE<span>.</span>
+</a>
 
-    <div class="tab-switcher">
-      <!-- Feed tab: shows all uploaded posts. active class = currently selected -->
-      <button class="tab-btn active" onclick="showTab('feed')">Feed</button>
-      <!-- Applauded tab: shows only posts you have applauded -->
-      <button class="tab-btn" onclick="showTab('applauded')">👏 Applauded</button>
-    </div>
-  </header>
+</header>
 
-  <!-- =============================================
-       MAIN CONTENT AREA
-  ============================================= -->
-  <main>
+<section class="hero">
 
-    <!-- FEED VIEW — shown by default when page loads -->
-    <div id="feed-view">
+<h1>STRIKE.</h1>
 
-      <!-- Upload zone — user clicks or drags files here -->
-      <div class="upload-zone" id="uploadZone">
+<p>Upload your report and expose corruption.</p>
 
-        <!-- Hidden file input: accepts images and videos, allows selecting multiple at once -->
-        <!-- onchange fires when files are selected, passing them to handleFiles() -->
-        <input type="file" id="fileInput" accept="image/*,video/*" multiple onchange="handleFiles(this.files)">
+</section>
 
-        <span class="upload-icon">⚡</span>
-        <div style="font-size:1rem; font-weight:500; margin-bottom:0.4rem;">Drop your strike here</div>
-        <div class="upload-label">Drag & drop or <strong>click to upload</strong> — images or videos</div>
-      </div>
+<section class="container">
 
-      <div class="section-label">All Posts</div>
-      <!-- Section heading above the posts grid -->
+<form id="reportForm">
 
-      <div class="posts-grid" id="postsGrid"></div>
-      <!-- This starts empty — JavaScript fills it with post cards dynamically -->
+<input
+  type="text"
+  id="reportTitle"
+  placeholder="Report title"
+  required>
 
-      <!-- Shown only when there are zero posts in the grid -->
-      <div class="empty-state" id="emptyState">
-        <span class="big">📭</span>
-        No posts yet — upload something above!
-      </div>
+<select id="category" required>
 
-    </div>
-    <!-- end #feed-view -->
+<option value="">
+Choose category
+</option>
 
-    <!-- APPLAUDED VIEW — hidden until the Applauded tab is clicked -->
-    <div id="applauded-view">
-      <div class="section-label">Posts You Applauded</div>
+<option>
+Corruption
+</option>
 
-      <div class="posts-grid" id="applaudedGrid"></div>
-      <!-- JavaScript fills this with only the posts where applauded = true -->
+<option>
+Police Brutality
+</option>
 
-      <!-- Shown when no posts have been applauded yet -->
-      <div class="applauded-empty" id="applaudedEmpty">
-        <span>👏</span>
-        Nothing applauded yet — go give some love!
-      </div>
-    </div>
-    <!-- end #applauded-view -->
+<option>
+Infrastructure
+</option>
 
-  </main>
+<option>
+Education
+</option>
 
-  <!-- =============================================
-       FOOTER — bottom of the page
-  ============================================= -->
-  <footer>
-    <span>My Strike</span>
-    <span id="foot-date"></span>
-    <!-- foot-date is filled in by JavaScript with today's date -->
-  </footer>
+<option>
+Health
+</option>
 
- <script src="script.js" defer></script>
-  
+</select>
+
+<input
+  type="text"
+  id="location"
+  placeholder="Location"
+  required>
+
+<textarea
+  id="description"
+  rows="6"
+  placeholder="Describe the incident..."
+  required>
+</textarea>
+
+<input
+  type="text"
+  id="reporter"
+  placeholder="Your name (optional)">
+
+<input
+  type="file"
+  id="fileInput"
+  accept="image/*,video/*">
+
+<div>
+
+<label>
+<input
+  type="radio"
+  name="urgency"
+  value="Low">
+
+Low
+</label>
+
+<label>
+<input
+  type="radio"
+  name="urgency"
+  value="Medium"
+  checked>
+
+Medium
+</label>
+
+<label>
+<input
+  type="radio"
+  name="urgency"
+  value="High">
+
+High
+</label>
+
+</div>
+
+<button type="submit">
+
+FILE STRIKE 
+
+</button>
+
+</form>
+
+</section>
+
+<script src="script.js"></script>
+
 </body>
-
 </html>
