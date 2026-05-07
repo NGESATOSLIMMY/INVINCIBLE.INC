@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Exposed</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+ 
+</head>
+<body>
+
+<header>
+  <a href="index.html" class="back-btn">← Home</a>
+  <div class="page-title">Ex<span>posed</span></div>
+  <div class="stats-pill">👏 <strong id="total-count">0</strong> applauded</div>
+</header>
+
+<div class="filter-bar">
+  <span class="filter-label">Show:</span>
+  <button class="filter-btn active" onclick="setFilter('all', this)">All</button>
+  <button class="filter-btn" onclick="setFilter('image', this)">Images</button>
+  <button class="filter-btn" onclick="setFilter('video', this)">Videos</button>
+</div>
+
+<main>
+  <div class="section-label">Your Applauded Strikes</div>
+  <div class="gallery" id="gallery"></div>
+  <div class="empty" id="empty" style="display:none">
+    <span class="big">🔍</span>
+    <p>Nothing exposed yet.<br>Go to <a href="my strike.html">My Strike</a> and applaud some posts!</p>
+  </div>
+</main>
+
+<footer>
+  <span>Exposed</span>
+  <span id="foot-date"></span>
+</footer>
+
+<!-- LIGHTBOX -->
+<div class="lightbox" id="lightbox" onclick="closeLightbox(event)">
+  <button class="lightbox-close" onclick="closeLightbox()">✕</button>
+  <div id="lb-media"></div>
+  <div class="lightbox-info">
+    <div class="lightbox-name" id="lb-name"></div>
+    <div class="lightbox-sub">
+      <span id="lb-claps"></span>
+      <span id="lb-date"></span>
+    </div>
+    <div class="lightbox-comments" id="lb-comments"></div>
+  </div>
+</div>
+<script src="script.js"></script>
+</body>
+</html>
